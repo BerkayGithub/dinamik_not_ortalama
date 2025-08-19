@@ -1,5 +1,6 @@
 import 'package:dinamik_not_ortalama/constants/app_constants.dart';
 import 'package:dinamik_not_ortalama/helper/data_helper.dart';
+import 'package:dinamik_not_ortalama/model/ders.dart';
 import 'package:dinamik_not_ortalama/widgets/ortalama_goster.dart';
 import 'package:flutter/material.dart';
 
@@ -11,10 +12,11 @@ class OrtalamaHesapApp extends StatefulWidget {
 }
 
 class _OrtalamaHesapAppState extends State<OrtalamaHesapApp> {
-  var formKey = GlobalKey<FormState>();
+  GlobalKey<FormState> formKey = GlobalKey<FormState>();
   var secilenNotText = "AA";
   double secilenNot = 4;
   double seclenCredit = 1;
+  String girilenDersAdi = '';
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +35,7 @@ class _OrtalamaHesapAppState extends State<OrtalamaHesapApp> {
               Expanded(flex: 2, child: _formOlustur()),
               Expanded(
                 flex: 1,
-                child: OrtalamaGoster(ortalama: 1.3252, dersSayisi: 3),
+                child: OrtalamaGoster(ortalama: DataHelper.ortalamaHesaple(), dersSayisi: DataHelper.tumDersler.length),
               ),
             ],
           ),
@@ -56,13 +58,16 @@ class _OrtalamaHesapAppState extends State<OrtalamaHesapApp> {
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildHarfler(),
-                _buildKrediler(),
-                IconButton(
-                  onPressed: () {},
-                  icon: Icon(Icons.arrow_forward_ios_sharp),
-                  color: AppSabitleri.anaRenk,
-                  iconSize: 30,
+                Expanded(child: _buildHarfler()),
+                SizedBox(width: 10),
+                Expanded(child: _buildKrediler()),
+                Expanded(
+                  child: IconButton(
+                    onPressed: _ortlamaHesaplaVeDersEkle,
+                    icon: Icon(Icons.arrow_forward_ios_sharp),
+                    color: AppSabitleri.anaRenk,
+                    iconSize: 30,
+                  ),
                 ),
               ],
             ),
@@ -72,8 +77,32 @@ class _OrtalamaHesapAppState extends State<OrtalamaHesapApp> {
     );
   }
 
+  TextFormField _buildTextFormField() {
+    return TextFormField(
+      onSaved: (girilenDeger){
+        setState(() {
+          girilenDersAdi = girilenDeger!;
+        });
+      },
+      validator: (s){
+        if(s!.isEmpty){
+          return "Lütfen bir ders giriniz";
+        }else{
+          return null;
+        }
+      },
+      decoration: InputDecoration(
+        labelText: "Ders",
+        hintText: "Ders ismini giriniz",
+        border: OutlineInputBorder(borderRadius: AppSabitleri.borderRadius),
+      ),
+      initialValue: girilenDersAdi,
+    );
+  }
+
   Container _buildKrediler() {
     return Container(
+      alignment: Alignment.center,
       padding: EdgeInsets.all(8.0),
       decoration: BoxDecoration(
         color: AppSabitleri.anaRenk.shade100.withAlpha(75),
@@ -95,6 +124,7 @@ class _OrtalamaHesapAppState extends State<OrtalamaHesapApp> {
 
   Container _buildHarfler() {
     return Container(
+      alignment: Alignment.center,
       padding: EdgeInsets.all(8.0),
       decoration: BoxDecoration(
         color: AppSabitleri.anaRenk.shade100.withAlpha(75),
@@ -114,14 +144,15 @@ class _OrtalamaHesapAppState extends State<OrtalamaHesapApp> {
     );
   }
 
-  TextFormField _buildTextFormField() {
-    return TextFormField(
-      initialValue: "",
-      decoration: InputDecoration(
-        labelText: "Ders",
-        hintText: "Ders ismini giriniz",
-        border: OutlineInputBorder(borderRadius: AppSabitleri.borderRadius),
-      ),
-    );
+  _ortlamaHesaplaVeDersEkle() {
+    if(formKey.currentState!.validate()){
+      formKey.currentState!.save();
+      var eklenecekDers = Ders(ad: girilenDersAdi, harfDegeri: secilenNot, krediDegeri: seclenCredit);
+      DataHelper.dersEkle(eklenecekDers);
+      print(DataHelper.tumDersler.toString());
+      setState(() {
+      });
+    }
   }
+
 }

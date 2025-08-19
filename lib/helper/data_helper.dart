@@ -1,6 +1,28 @@
+import 'package:dinamik_not_ortalama/model/ders.dart';
 import 'package:flutter/material.dart';
 
 class DataHelper {
+
+  static List<Ders> tumDersler = [];
+
+  static void dersEkle(Ders d){
+    tumDersler.add(d);
+  }
+
+  static double ortalamaHesaple(){
+    double toplam = 0.0;
+    double toplamKredi = 0;
+    for (var ders in tumDersler) {
+      toplam += ders.harfDegeri * ders.krediDegeri;
+      toplamKredi += ders.krediDegeri;
+    }
+    if(toplamKredi == 0){
+      return 0;
+    }else{
+      return (toplam/toplamKredi);
+    }
+  }
+
   static List<String> _tumDerslerinHarfleri() {
     return ["AA", "BA", "BB", "CB", "CC", "DC", "DD", "FF"];
   }
@@ -40,7 +62,7 @@ class DataHelper {
   }
 
   static List<double> _tumNotlar(){
-    return [1,2,3,4,5];
+    return [1,2,3,4];
   }
 
   static List<DropdownMenuItem<double>> krediListesiniDondur(){
