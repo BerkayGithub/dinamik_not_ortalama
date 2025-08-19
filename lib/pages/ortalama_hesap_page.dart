@@ -1,6 +1,9 @@
 import 'package:dinamik_not_ortalama/constants/app_constants.dart';
 import 'package:dinamik_not_ortalama/helper/data_helper.dart';
 import 'package:dinamik_not_ortalama/model/ders.dart';
+import 'package:dinamik_not_ortalama/widgets/credit_dropdown_widget.dart';
+import 'package:dinamik_not_ortalama/widgets/ders_listesi.dart';
+import 'package:dinamik_not_ortalama/widgets/harf_dropdown_widget.dart';
 import 'package:dinamik_not_ortalama/widgets/ortalama_goster.dart';
 import 'package:flutter/material.dart';
 
@@ -13,7 +16,6 @@ class OrtalamaHesapApp extends StatefulWidget {
 
 class _OrtalamaHesapAppState extends State<OrtalamaHesapApp> {
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  var secilenNotText = "AA";
   double secilenNot = 4;
   double seclenCredit = 1;
   String girilenDersAdi = '';
@@ -39,7 +41,13 @@ class _OrtalamaHesapAppState extends State<OrtalamaHesapApp> {
               ),
             ],
           ),
-          Expanded(child: Center(child: Text("Form buraya gelecek"))),
+          Expanded(child: Center(child: DersListesi(
+            onElemanCikarildi: (index){
+              DataHelper.tumDersler.removeAt(index);
+              setState(() {
+              });
+            },
+          ))),
         ],
       ),
     );
@@ -58,9 +66,17 @@ class _OrtalamaHesapAppState extends State<OrtalamaHesapApp> {
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Expanded(child: _buildHarfler()),
+                Expanded(child: HarfDropDownWidget(harfSecildi: (secilenNotTemp){
+                  setState(() {
+                    secilenNot = secilenNotTemp;
+                  });
+                })),
                 SizedBox(width: 10),
-                Expanded(child: _buildKrediler()),
+                Expanded(child: CreditDropDownWidget(onCreditSecildi: (seclenCreditTemp){
+                  setState(() {
+                    seclenCredit = seclenCreditTemp;
+                  });
+                })),
                 Expanded(
                   child: IconButton(
                     onPressed: _ortlamaHesaplaVeDersEkle,
@@ -79,6 +95,7 @@ class _OrtalamaHesapAppState extends State<OrtalamaHesapApp> {
 
   TextFormField _buildTextFormField() {
     return TextFormField(
+      keyboardType: TextInputType.text,
       onSaved: (girilenDeger){
         setState(() {
           girilenDersAdi = girilenDeger!;
@@ -97,50 +114,6 @@ class _OrtalamaHesapAppState extends State<OrtalamaHesapApp> {
         border: OutlineInputBorder(borderRadius: AppSabitleri.borderRadius),
       ),
       initialValue: girilenDersAdi,
-    );
-  }
-
-  Container _buildKrediler() {
-    return Container(
-      alignment: Alignment.center,
-      padding: EdgeInsets.all(8.0),
-      decoration: BoxDecoration(
-        color: AppSabitleri.anaRenk.shade100.withAlpha(75),
-        borderRadius: AppSabitleri.borderRadius,
-      ),
-      child: DropdownButton<double>(
-        elevation: 16,
-        iconEnabledColor: AppSabitleri.anaRenk.shade200,
-        items: DataHelper.krediListesiniDondur(),
-        onChanged: (double? seclenCreditTemp) {
-          setState(() {
-            seclenCredit = seclenCreditTemp!;
-          });
-        },
-        value: seclenCredit,
-      ),
-    );
-  }
-
-  Container _buildHarfler() {
-    return Container(
-      alignment: Alignment.center,
-      padding: EdgeInsets.all(8.0),
-      decoration: BoxDecoration(
-        color: AppSabitleri.anaRenk.shade100.withAlpha(75),
-        borderRadius: AppSabitleri.borderRadius,
-      ),
-      child: DropdownButton<double>(
-        elevation: 16,
-        iconEnabledColor: AppSabitleri.anaRenk.shade200,
-        items: DataHelper.harfListesiDondur(),
-        onChanged: (double? secilenNotTemp) {
-          setState(() {
-            secilenNot = secilenNotTemp!;
-          });
-        },
-        value: secilenNot,
-      ),
     );
   }
 
